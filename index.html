@@ -201,6 +201,7 @@ body.authmode .shell{display:none}body.authmode #auth{display:grid}
 #confetti{position:fixed;inset:0;pointer-events:none;z-index:95}
 @media(max-width:600px){.hero{padding:20px;border-radius:18px}.cont{flex-wrap:wrap}.cont .btn{width:100%}.sync .st{display:none}.namein{display:flex}.namein input{flex:1;min-width:0;width:auto}.sechead{flex-direction:column;align-items:flex-start}.qcard{padding:20px}.sl{grid-template-columns:1fr 84px}.sl label{grid-column:1/-1}.lhead h1{font-size:1.5rem}article.lesson{font-size:1rem}.sec.practice{padding:4px 14px 14px!important}.endcta{padding:18px}}
 </style>
+<link rel="stylesheet" href="brokers.css">
 </head>
 <body>
 <div id="auth"></div>
@@ -209,13 +210,14 @@ body.authmode .shell{display:none}body.authmode #auth{display:grid}
   <div class="mainwrap">
     <div class="topbar"><button class="iconbtn" id="menu" aria-label="Abrir menú"></button><div class="crumb" id="crumb"></div><div class="sp"></div><div class="sync" id="syncwrap"></div><button class="iconbtn" id="theme" aria-label="Cambiar tema"></button><div class="readbar" id="readbar"></div></div>
     <main id="app"></main>
-    <footer class="legal">GEMA Intelligence Labs · Curso didáctico: no es asesoría financiera ni promete ganancias. Ejemplos y gráficos ficticios. · <a href="privacidad.html">Privacidad y términos</a></footer>
+    <footer class="legal">GEMA Intelligence Labs · Curso didáctico: no es asesoría financiera ni promete ganancias. Ejemplos y gráficos ficticios. · <a href="privacidad.html">Privacidad y términos</a> · <a href="plataformas.html">Brókeres y plataformas</a></footer>
   </div>
 </div>
 <div class="scrim" id="scrim"></div>
 <div id="lightbox"><img alt=""></div>
 <canvas id="confetti"></canvas>
 <div class="toast" id="toast"></div>
+<script src="brokers.js"></script>
 <script>
 let DATA = {}, QUIZ = {};
 const CFG = {"url": "https://jhykfvneslxynsxmdoix.supabase.co", "key": "sb_publishable_0QCx_ksaayPIzkfY1QXX8g_iEwMeyCm"};
@@ -347,7 +349,7 @@ function lessonPct(id){const n=nSecs(id),s=(S.secs[id]||[]).length;return S.read
 function renderSide(route){const nm=S.nombre||(EMAIL?EMAIL.split("@")[0]:"Alumno"),ini=(nm[0]||"A").toUpperCase();
  const it=(h,ic,t)=>`<a class="navitem ${route===h?"on":""}" href="${h}">${I(ic)}${t}</a>`;
  $("#side").innerHTML=`<a class="brand" href="#/"><span class="logo">${I("candle").replace("<svg",'<svg width="20" height="20" style="color:#F5B83D"')}</span><span>GEMA Campus<small>INTELLIGENCE LABS</small></span></a>
- <nav class="navlist">${it("#/","home","Inicio")}${it("#/taller","candle","Taller de velas")}${it("#/reto","target","Reto de formas")}${it("#/cuaderno","book","Mi cuaderno")}</nav>
+ <nav class="navlist">${it("#/","home","Inicio")}${it("#/taller","candle","Taller de velas")}${it("#/reto","target","Reto de formas")}${it("#/cuaderno","book","Mi cuaderno")}<a class="navitem" href="plataformas.html">${I("book")} Brókeres y plataformas</a></nav>
  ${[1,2,3,4].map(l=>{const ws=COURSE.filter(w=>w.l===l),act=ws.some(w=>w.id&&(route==="#/leccion/"+w.id||route==="#/quiz/"+w.id)),
   open=act||(l in SIDE?SIDE[l]:ws.some(w=>weekState(w)==="cur")),nd=ws.filter(w=>weekState(w)==="done").length;
   return`<details class="lvl" data-l="${l}" ${open?"open":""}><summary class="sidehead"><span>${LVL[l][0]} · ${LVL[l][1]}</span><span class="lvlmeta">${nd}/${ws.length}${I("chev")}</span></summary><div class="navlist" style="margin-top:6px">${ws.map(w=>{const st=weekState(w),on=route==="#/leccion/"+w.id||route==="#/quiz/"+w.id;
@@ -383,6 +385,7 @@ function vHome(){const nd=COURSE.filter(w=>weekState(w)==="done").length,pct=Mat
  <div class="tools"><a class="card tool" href="#/taller"><span class="ic">${I("candle")}</span><div><b>Taller de velas</b><span>Mueve apertura, máximo, mínimo y cierre y mira cómo cambia la vela.</span></div></a>
  <a class="card tool" href="#/reto"><span class="ic">${I("target")}</span><div><b>Reto de formas</b><span>Velas nuevas sin fin. ¿Cuánto dura tu racha?</span></div></a>
  <a class="card tool" href="#/cuaderno"><span class="ic">${I("book")}</span><div><b>Mi cuaderno</b><span>Tus velas guardadas, listas para exportar.</span></div></a></div></div>`;
+ const homeHero=app.querySelector(".hero");if(homeHero&&window.GemaBrokers)homeHero.insertAdjacentHTML("afterend",window.GemaBrokers.render());
  const ok=$("#nmok");if(ok){const go=()=>{const v=$("#nm").value.trim();if(v){S.nombre=v;save();vHome();renderSide("#/")}};ok.onclick=go;$("#nm").onkeydown=e=>{if(e.key==="Enter")go()}}}
 function buildLesson(id){const w=COURSE.find(x=>x.id===id),tmp=document.createElement("div");tmp.innerHTML=DATA[id].html;
  const h1=tmp.querySelector("h1"),title=h1?h1.textContent:w.t;if(h1)h1.remove();
@@ -406,6 +409,7 @@ function vLeccion(id){const w=COURSE.find(x=>x.id===id);if(!unlocked(w)&&!done(i
  app.innerHTML=`<div class="fade"><div class="lhead"><span class="kicker">${w.p?"Patrimonio "+w.lab:"Semana "+w.n} · ${LVL[w.l][0]} · ${LVL[w.l][1]}</span><h1>${esc(title.replace(/^(Semana \d+|Patrimonio P\d) · /,""))}</h1>
  <div class="lmeta">${meta?meta.split("·").map(x=>`<span class="chip">${esc(x.trim())}</span>`).join(""):""}<span class="chip gold" id="lp">${lessonPct(id)}% leído</span>${(S.quiz[id]!=null)?`<span class="chip ${S.quiz[id]>=4?"up":"down"}">Quiz ${S.quiz[id]}/5</span>`:""}</div></div>
  <div class="lgrid"><div id="artslot"></div><nav class="toc"><span class="kicker">En esta lección</span>${list.map((s,i)=>{const h=s.querySelector("h2,summary");const t=h?h.textContent.replace(/·.*$/,"").trim():"Introducción";return`<a href="#" data-to="${i}"><span class="ck">${seen.has(i)?"✓":"○"}</span><span>${esc(t)}</span></a>`}).join("")}</nav></div></div>`;
+ if(id==="s5"&&window.GemaBrokers)art.insertAdjacentHTML("afterbegin",`<aside class="gb-course-callout"><h2>Cómo manejar Webull, Robinhood y tastytrade</h2><p>Complemento práctico de esta semana: ubica listas, gráficos, tickets y estados. Practica con el caso ficticio antes de utilizar una cuenta real.</p><a href="plataformas.html">Abrir el capítulo de las tres plataformas ↗</a></aside>`+window.GemaBrokers.render());
  $("#artslot").appendChild(art);
  art.insertAdjacentHTML("beforeend",`<div class="endcta"><div><h3>${done(id)?"Semana completada ✓":"¿Listo para comprobarlo?"}</h3><p class="muted" style="margin:0">Quiz de 5 preguntas. Apruebas con 4 de 5 y se abre la siguiente semana. Intentos ilimitados.</p></div><div style="display:flex;gap:10px;flex-wrap:wrap"><a class="btn btn-s" href="#/taller">${I("candle")} Taller</a><a class="btn btn-p" href="#/quiz/${id}">${I("play")} Hacer el quiz</a></div></div>`);
  art.querySelectorAll("[data-w=taller]").forEach(el=>mountTaller(el));art.querySelectorAll("[data-w=reto]").forEach(el=>mountReto(el));
@@ -459,9 +463,9 @@ function loadScript(src){return new Promise((ok,ko)=>{const t=document.createEle
 function start(){document.body.classList.remove("authmode");addEventListener("hashchange",route);route()}
 function fail(e){document.body.classList.remove("authmode");app.innerHTML=`<div class="card"><b style="color:var(--down)">No se pudo cargar tu campus.</b><p class="muted">${esc(e&&e.message)}</p><button class="btn btn-p" onclick="location.reload()">Reintentar</button></div>`}
 function authShell(inner){document.body.classList.add("authmode");$("#auth").innerHTML=`<div class="authart"><a class="brand" style="color:#EAF0FF"><span class="logo">${I("candle").replace("<svg",'<svg width="20" height="20" style="color:#F5B83D"')}</span><span>GEMA Campus<small>INTELLIGENCE LABS</small></span></a>
- <div><h1>Aprende a leer el mercado, paso a paso.</h1><p>Un curso didáctico para la comunidad latina, de aquí y de afuera: lecciones claras, práctica interactiva y tu progreso guardado.</p></div>
+ <div><h1>Aprende a leer el mercado, paso a paso.</h1><p>Un curso didáctico para la comunidad latina, de aquí y de afuera: lecciones claras, práctica interactiva y tu progreso guardado.</p><p class="gb-entry-link"><a href="plataformas.html">Webull, Robinhood y tastytrade: guías y referidos personales ↗</a></p></div>
  <svg class="bigart" viewBox="0 0 420 160" width="100%" style="max-width:460px" aria-hidden="true">${Array.from({length:14},(_,i)=>{const x=20+i*29,o=110-i*5+(i%3?10:-14),c=o-(i%3?18:-10),h=Math.min(o,c)-12,l=Math.max(o,c)+12,col=c<o?"#22C55E":"#EF4444";return`<line x1="${x}" x2="${x}" y1="${h}" y2="${l}" stroke="${col}" stroke-width="2.5"/><rect x="${x-8}" y="${Math.min(o,c)}" width="16" height="${Math.abs(o-c)}" rx="3" fill="${col}"/>`}).join("")}</svg>
- <p style="font-size:.78rem;color:#8D99B8">Curso didáctico · no es asesoría financiera · <a href="privacidad.html">Privacidad y términos</a></p></div><div class="authform">${inner}</div>`}
+ <p style="font-size:.78rem;color:#8D99B8">Curso didáctico · no es asesoría financiera · <a href="privacidad.html">Privacidad y términos</a></p></div><div class="authform"><div class="gb-auth-stack">${inner}${window.GemaBrokers?window.GemaBrokers.render(true):""}</div></div>`}
 function vLogin(){authShell(`<div class="card fade"><span class="kicker">Acceso de alumnos</span><h2>Entra a tu campus</h2><p class="muted" style="margin:0">Escribe el correo con el que te inscribiste. Te enviaremos un acceso. Sin contraseñas.</p>
  <form id="f1"><div class="field"><label for="em">Correo</label><input id="em" name="email" type="email" autocomplete="email" required autofocus placeholder="tu@correo.com"></div><button class="btn btn-p" id="go" type="submit" style="width:100%">Enviar acceso ${I("arrow")}</button></form>
  <div id="paso2"></div><p id="lm" class="small" style="margin:14px 0 0"></p></div>`);
