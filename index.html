@@ -273,7 +273,8 @@ function save(){S.ts=Date.now();try{localStorage.setItem(LKEY,JSON.stringify(S))
  if(sb&&UID){clearTimeout(syncT);setSync("saving");syncT=setTimeout(async()=>{
   const{error}=await sb.from("progreso").upsert({user_id:UID,data:S,actualizado:new Date().toISOString()});setSync(error?"err":"ok")},700)}}
 const done=id=>!!(S.read[id]&&(S.quiz[id]||0)>=4);
-function unlocked(w){if(!w.id||!DATA[w.id])return false;if(w.n===1)return true;const p=COURSE.find(x=>x.n===w.n-1);return !p.id||!DATA[p.id]||done(p.id)}
+const ADMINS=["albertofer87@icloud.com","albertoferrerpascual@gmail.com","gemaopt26@gmail.com"];
+function unlocked(w){if(!w.id||!DATA[w.id])return false;if(w.n===1||ADMINS.includes((EMAIL||"").toLowerCase()))return true;const p=COURSE.find(x=>x.n===w.n-1);return !p.id||!DATA[p.id]||done(p.id)}
 function toast(m){const t=$("#toast");t.innerHTML=m;t.classList.add("show");clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove("show"),2600)}
 /* ---------- velas ---------- */
 const r2=x=>Math.round(x*100)/100,f2=x=>Number(x).toFixed(2);
