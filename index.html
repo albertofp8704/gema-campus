@@ -130,6 +130,7 @@ article.lesson table{border-collapse:collapse;width:100%;font-size:.93rem}
 article.lesson th{background:var(--surface2);color:var(--text);text-align:left;font-weight:600;padding:10px 14px;border-bottom:1px solid var(--line)}
 article.lesson td{padding:10px 14px;border-bottom:1px solid var(--line);vertical-align:top}article.lesson tr:last-child td{border-bottom:0}
 article.lesson tbody tr:hover td{background:var(--surface2)}
+.gvideo{position:relative;aspect-ratio:16/9;border-radius:16px;overflow:hidden;border:1px solid var(--line);background:#000;margin:0 0 18px}.gvideo iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
 figure.fig{margin:20px 0;border-radius:16px;overflow:hidden;border:1px solid var(--line);background:#0F1729;cursor:zoom-in;position:relative}
 figure.fig img{display:block;width:100%;height:auto}figure.fig figcaption{padding:10px 14px;font-size:.84rem;color:var(--muted);background:var(--surface);border-top:1px solid var(--line)}
 figure.fig .zoom{position:absolute;right:10px;top:10px;background:rgba(11,16,32,.75);color:#fff;border-radius:8px;padding:4px 8px;font-size:.75rem;opacity:0;transition:opacity .2s}figure.fig:hover .zoom{opacity:1}
@@ -219,7 +220,7 @@ body.authmode .shell{display:none}body.authmode #auth{display:grid}
 <div class="toast" id="toast"></div>
 <script src="brokers.js"></script>
 <script>
-let DATA = {}, QUIZ = {};
+let DATA = {}, QUIZ = {}, VIDEOS = {"s1": "ed8VE1ZPxNE", "s2": "pJ3sOznQHe0", "s3": "C081KaG3hn4", "s4": "qXD0O2ybcSk", "s5": "aMmn3FKt5kk", "s6": "Sj4VNGmHD4M", "s7": "X_k4jr4M7DU"};
 const CFG = {"url": "https://jhykfvneslxynsxmdoix.supabase.co", "key": "sb_publishable_0QCx_ksaayPIzkfY1QXX8g_iEwMeyCm"};
 const SB_CDN = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js";
 const COURSE = [
@@ -395,6 +396,7 @@ function buildLesson(id){const w=COURSE.find(x=>x.id===id),tmp=document.createEl
  [...tmp.childNodes].forEach(n=>{if(n.nodeType===1&&n.tagName==="H2"){sec=document.createElement("section");sec.className="sec";secs.push(sec)}
   if(n.nodeType===1&&n.tagName==="DETAILS"){sec=document.createElement("section");sec.className="sec";secs.push(sec)}sec.appendChild(n)});
  secs.filter(s=>s.textContent.trim()||s.querySelector("img")).forEach(s=>art.appendChild(s));
+ if(VIDEOS[id]){const v=document.createElement("section");v.className="sec";v.innerHTML='<div class="gvideo"><iframe src="https://www.youtube-nocookie.com/embed/'+VIDEOS[id]+'?rel=0&modestbranding=1" title="Video" loading="lazy" allow="accelerometer; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe></div>';art.insertBefore(v,art.firstChild)}
  art.querySelectorAll("blockquote").forEach(b=>{if(/didáctico/.test(b.textContent))b.classList.add("legal")});
  art.querySelectorAll("table").forEach(t=>{const w=document.createElement("div");w.className="twrap";t.replaceWith(w);w.appendChild(t)});
  art.querySelectorAll("p > img").forEach(img=>{const f=document.createElement("figure");f.className="fig";const cap=document.createElement("figcaption");cap.textContent=img.alt;f.innerHTML='<span class="zoom">Ampliar</span>';f.appendChild(img.cloneNode());f.appendChild(cap);img.parentElement.replaceWith(f)});
