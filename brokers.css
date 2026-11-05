@@ -4,3 +4,8 @@
 .authform>.gb-auth-stack{width:min(480px,100%)}.authform .gb-auth-stack>.card{width:100%}.authform .gb-auth-stack>.gb-compact{width:100%}
 
 [data-theme=light] .gb-all,[data-theme=light] .gb-kicker,[data-theme=light] .gb-course-callout a{color:#805211}
+.gb-referral-ribbon{display:flex;align-items:center;flex-wrap:wrap;gap:6px 14px;margin-top:14px;padding:9px 12px;border:1px solid var(--line,#263156);border-radius:8px;background:var(--bg,#0b1020);font-size:.72rem;line-height:1.45;color:var(--text2,#c3cce4)}
+.gb-referral-ribbon span:first-child{font-weight:700;color:var(--muted,#8d99b8)}
+.gb-referral-ribbon a{color:var(--gold,#f5b83d);text-decoration:underline;text-underline-offset:2px;font-weight:600}
+.gb-referral-ribbon a:focus-visible{outline:3px solid var(--blue,#60a5fa);outline-offset:3px}
+.gb-compact .gb-referral-ribbon{font-size:.68rem;margin-top:10px;padding:7px 9px}
