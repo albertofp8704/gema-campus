@@ -246,7 +246,7 @@ const COURSE = [
  {n:19,lab:"P3",t:"Margen y apalancamiento",l:4,p:1,id:"p3",d:"Cómo funciona, margin call y portfolio margin"},
  {n:20,lab:"P4",t:"Patrimonio como los grandes",l:4,p:1,id:"p4",d:"Préstamos sobre cartera, estructuras y legado"}];
 const BASE = COURSE.filter(w=>!w.p).length;
-const LVL = {1:["Nivel 1","Fundamentos"],2:["Nivel 2","Intermedio"],3:["Nivel 3","Opciones y método GEMA"],4:["Nivel 4","Patrimonio"]};
+const LVL = {1:["Nivel 1","Fundamentos"],2:["Nivel 2","Intermedio"],3:["Nivel 3","Opciones y método GEMA"],4:["Nivel 4","Patrimonio"],5:["Nivel 5","Mesa institucional · privado"]};
 /* ---------- iconos ---------- */
 const I = n => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${{
  home:'<path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/>',
@@ -275,7 +275,7 @@ function save(){S.ts=Date.now();try{localStorage.setItem(LKEY,JSON.stringify(S))
  if(sb&&UID){clearTimeout(syncT);setSync("saving");syncT=setTimeout(async()=>{
   const{error}=await sb.from("progreso").upsert({user_id:UID,data:S,actualizado:new Date().toISOString()});setSync(error?"err":"ok")},700)}}
 const done=id=>!!(S.read[id]&&(S.quiz[id]||0)>=4);
-let REVISOR=false;function unlocked(w){if(!w.id||!DATA[w.id])return false;if(REVISOR)return true;if(w.n===1)return true;const p=COURSE.find(x=>x.n===w.n-1);return !p.id||!DATA[p.id]||done(p.id)}
+let REVISOR=false;function unlocked(w){if(!w.id||!DATA[w.id])return false;if(w.x)return true;if(REVISOR)return true;if(w.n===1)return true;const p=COURSE.find(x=>x.n===w.n-1);return !p.id||!DATA[p.id]||done(p.id)}
 function toast(m){const t=$("#toast");t.innerHTML=m;t.classList.add("show");clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove("show"),2600)}
 /* ---------- velas ---------- */
 const r2=x=>Math.round(x*100)/100,f2=x=>Number(x).toFixed(2);
@@ -352,7 +352,7 @@ function renderSide(route){const nm=S.nombre||(EMAIL?EMAIL.split("@")[0]:"Alumno
  const it=(h,ic,t)=>`<a class="navitem ${route===h?"on":""}" href="${h}">${I(ic)}${t}</a>`;
  $("#side").innerHTML=`<a class="brand" href="#/"><span class="logo">${I("candle").replace("<svg",'<svg width="20" height="20" style="color:#F5B83D"')}</span><span>GEMA Campus<small>INTELLIGENCE LABS</small></span></a>
  <nav class="navlist">${it("#/","home","Inicio")}${it("#/taller","candle","Taller de velas")}${it("#/reto","target","Reto de formas")}${it("#/cuaderno","book","Mi cuaderno")}<a class="navitem" href="plataformas.html">${I("book")} Brókeres y plataformas</a></nav>
- ${[1,2,3,4].map(l=>{const ws=COURSE.filter(w=>w.l===l),act=ws.some(w=>w.id&&(route==="#/leccion/"+w.id||route==="#/quiz/"+w.id)),
+ ${[1,2,3,4,5].filter(l=>COURSE.some(w=>w.l===l)).map(l=>{const ws=COURSE.filter(w=>w.l===l),act=ws.some(w=>w.id&&(route==="#/leccion/"+w.id||route==="#/quiz/"+w.id)),
   open=act||(l in SIDE?SIDE[l]:ws.some(w=>weekState(w)==="cur")),nd=ws.filter(w=>weekState(w)==="done").length;
   return`<details class="lvl" data-l="${l}" ${open?"open":""}><summary class="sidehead"><span>${LVL[l][0]} · ${LVL[l][1]}</span><span class="lvlmeta">${nd}/${ws.length}${I("chev")}</span></summary><div class="navlist" style="margin-top:6px">${ws.map(w=>{const st=weekState(w),on=route==="#/leccion/"+w.id||route==="#/quiz/"+w.id;
   return`<a class="wkitem ${on?"on":""} ${st==="soon"||st==="lock"||st==="premium"?"off":""}" href="${st==="soon"||st==="lock"||st==="premium"?"#/":"#/leccion/"+w.id}"><span class="dot ${st==="done"?"done":st==="cur"?"cur":""}">${st==="done"?"✓":st==="lock"?"🔒":st==="premium"?"★":(w.lab||w.n)}</span><span>${w.t}</span></a>`}).join("")}</div></details>`}).join("")}
@@ -379,7 +379,7 @@ function vHome(){const nd=COURSE.filter(w=>weekState(w)==="done").length,pct=Mat
   <div class="card stat"><b class="streak">${I("flame").replace("<svg",'<svg width="24" height="24"')} ${S.best}</b><span>mejor racha en el reto</span></div>
   <div class="card stat"><b>${S.nb.length}</b><span>velas en tu cuaderno</span></div></div>
  <div class="sechead"><h2>Tu ruta</h2><span class="muted small">${BASE} semanas · 3 niveles + Nivel 4 Patrimonio · cada semana se abre al aprobar la anterior</span></div>
- <div class="levels">${[1,2,3,4].map(l=>`<div class="level"><span class="kicker">${LVL[l][0]}</span><h3>${LVL[l][1]}</h3><ul class="path">${COURSE.filter(w=>w.l===l).map(w=>{const st=weekState(w);
+ <div class="levels">${[1,2,3,4,5].filter(l=>COURSE.some(w=>w.l===l)).map(l=>`<div class="level"><span class="kicker">${LVL[l][0]}</span><h3>${LVL[l][1]}</h3><ul class="path">${COURSE.filter(w=>w.l===l).map(w=>{const st=weekState(w);
   const node=`<span class="node ${st==="done"?"done":st==="cur"?"cur":st==="lock"?"lock":""}">${st==="done"?"✓":st==="lock"?I("lock").replace("<svg",'<svg width="16" height="16"'):(w.lab||w.n)}</span>`;
   const tag=st==="done"?'<span class="chip up">Completada</span>':st==="cur"?'<span class="chip gold">Disponible</span>':st==="lock"?'<span class="chip">Aprueba la anterior</span>':st==="premium"?'<span class="chip gold">Acceso aparte</span>':'<span class="chip">Próximamente</span>';
   return`<li>${node}<div class="info">${st==="cur"||st==="done"?`<a href="#/leccion/${w.id}">${w.t}</a>`:`<span class="t" style="color:var(--text2)">${w.t}</span>`}<div class="s">${w.d}</div></div>${tag}</li>`}).join("")}</ul></div>`).join("")}</div>
@@ -407,9 +407,9 @@ function buildLesson(id){const w=COURSE.find(x=>x.id===id),tmp=document.createEl
  if(id==="s3"){wid(/formas básicas/i,"reto","Mini reto: ¿qué forma es?","Interactivo")}
  DATA[id]._n=list.length;return{title,meta,art,list}}
 function vLeccion(id){const w=COURSE.find(x=>x.id===id);if(!unlocked(w)&&!done(id)){location.hash="#/";return}
- const{title,meta,art,list}=buildLesson(id);setCrumb(`${w.p?"Patrimonio "+w.lab:"Semana "+w.n} · <b>${w.t}</b>`);
+ const{title,meta,art,list}=buildLesson(id);setCrumb(`${w.p?(w.x?"Mesa ":"Patrimonio ")+w.lab:"Semana "+w.n} · <b>${w.t}</b>`);
  const seen=new Set(S.secs[id]||[]);
- app.innerHTML=`<div class="fade"><div class="lhead"><span class="kicker">${w.p?"Patrimonio "+w.lab:"Semana "+w.n} · ${LVL[w.l][0]} · ${LVL[w.l][1]}</span><h1>${esc(title.replace(/^(Semana \d+|Patrimonio P\d) · /,""))}</h1>
+ app.innerHTML=`<div class="fade"><div class="lhead"><span class="kicker">${w.p?(w.x?"Mesa ":"Patrimonio ")+w.lab:"Semana "+w.n} · ${LVL[w.l][0]} · ${LVL[w.l][1]}</span><h1>${esc(title.replace(/^(Semana \d+|Patrimonio P\d|Mesa M\d+) · /,""))}</h1>
  <div class="lmeta">${meta?meta.split("·").map(x=>`<span class="chip">${esc(x.trim())}</span>`).join(""):""}<span class="chip gold" id="lp">${lessonPct(id)}% leído</span>${(S.quiz[id]!=null)?`<span class="chip ${S.quiz[id]>=4?"up":"down"}">Quiz ${S.quiz[id]}/5</span>`:""}</div></div>
  <div class="lgrid"><div id="artslot"></div><nav class="toc"><span class="kicker">En esta lección</span>${list.map((s,i)=>{const h=s.querySelector("h2,summary");const t=h?h.textContent.replace(/·.*$/,"").trim():"Introducción";return`<a href="#" data-to="${i}"><span class="ck">${seen.has(i)?"✓":"○"}</span><span>${esc(t)}</span></a>`}).join("")}</nav></div></div>`;
  if(id==="s5"&&window.GemaBrokers)art.insertAdjacentHTML("afterbegin",`<aside class="gb-course-callout"><h2>Cómo manejar Webull, Robinhood y tastytrade</h2><p>Complemento práctico de esta semana: ubica listas, gráficos, tickets y estados. Practica con el caso ficticio antes de utilizar una cuenta real.</p><a href="plataformas.html">Abrir el capítulo de las tres plataformas ↗</a></aside>`+window.GemaBrokers.render());
@@ -424,7 +424,7 @@ function vLeccion(id){const w=COURSE.find(x=>x.id===id);if(!unlocked(w)&&!done(i
  list.forEach((s,i)=>{const end=document.createElement("span");end.dataset.i=i;end.style.cssText="display:block;height:1px";s.appendChild(end);io.observe(end)});
  const io2=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){$$(".toc a").forEach(a=>a.classList.toggle("on",a.dataset.to===e.target.id.slice(4)))}}),{rootMargin:"-30% 0px -60% 0px"});list.forEach(s=>io2.observe(s));
  CLEAN.push(()=>{io.disconnect();io2.disconnect()})}
-function vQuiz(id){const w=COURSE.find(x=>x.id===id);setCrumb(`${w.p?"Patrimonio "+w.lab:"Semana "+w.n} · <b>Quiz</b>`);const qs=QUIZ[id].map(q=>({...q,ord:shuffle(q.a.map((_,i)=>i))}));let i=0,score=0;
+function vQuiz(id){const w=COURSE.find(x=>x.id===id);setCrumb(`${w.p?(w.x?"Mesa ":"Patrimonio ")+w.lab:"Semana "+w.n} · <b>Quiz</b>`);const qs=QUIZ[id].map(q=>({...q,ord:shuffle(q.a.map((_,i)=>i))}));let i=0,score=0;
  function paint(){if(i>=qs.length){const prev=S.quiz[id]||0;S.quiz[id]=Math.max(prev,score);const pass=score>=4;save();
   app.innerHTML=`<div class="focus fade"><div class="qcard result"><span class="ring big" style="--p:${score*20}" data-v="${score}/5"></span><h2 style="margin:0 0 8px">${pass?"¡Aprobado!":"Casi. Vuelve a intentarlo"}</h2>
   <p class="muted">${pass?(done(id)?"Semana completada. La siguiente ya está disponible.":"Aprobaste el quiz. Termina de leer la lección para completar la semana."):"Necesitas 4 de 5. Repasa la lección: no hay límite de intentos."}</p>
@@ -486,9 +486,9 @@ function vSinAcceso(){authShell(`<div class="card fade"><h2>Tu correo aún no ti
 async function salir(){try{await sb.auth.signOut()}catch(e){}location.hash="#/";location.reload()}
 async function entrar(u){UID=u.id;EMAIL=u.email;LKEY="gema_campus_"+UID;
  const a=await sb.from("alumnos_autorizados").select("email,nota").maybeSingle();if(a.error)return fail(a.error);if(!a.data)return vSinAcceso();REVISOR=/revisor/i.test(a.data.nota||"");
- const[L,P]=await Promise.all([sb.from("lecciones").select("id,html,quiz"),sb.from("progreso").select("data").maybeSingle()]);
+ const[L,P]=await Promise.all([sb.from("lecciones").select("id,html,quiz,titulo,nivel,semana"),sb.from("progreso").select("data").maybeSingle()]);
  if(L.error||P.error)return fail(L.error||P.error);
- DATA={};QUIZ={};for(const r of L.data){DATA[r.id]={html:r.html};QUIZ[r.id]=r.quiz}
+ DATA={};QUIZ={};for(const r of L.data){DATA[r.id]={html:r.html};QUIZ[r.id]=r.quiz;if(r.nivel>=5&&!COURSE.some(w=>w.id===r.id)){const m=/^Mesa (M\d+) · ([^:]+):?\s*(.*)$/.exec(r.titulo||"")||[];COURSE.push({n:r.semana,lab:m[1]||r.id.toUpperCase(),t:m[2]||r.titulo,l:5,p:1,x:1,id:r.id,d:m[3]||"Solo para ti"})}}COURSE.sort((a,b)=>a.n-b.n);
  S=merge(merge(S0(),loadLocal(LKEY)),(P.data&&P.data.data)||{});setSync("ok");
  if(/access_token|type=magiclink/.test(location.hash))history.replaceState(null,"",location.pathname+"#/");start()}
 async function boot(){let t="dark";try{t=localStorage.getItem("gema_theme")||"dark"}catch(e){}theme(t);
